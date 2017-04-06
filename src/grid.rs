@@ -1,7 +1,12 @@
 extern crate rand;
 use self::rand::Rng;
 use std::fmt;
-use cell::Cell;
+
+#[derive(Debug)]
+pub enum Cell {
+    Alive,
+    Dead,
+}
 
 pub struct Grid {
     cells: Vec<Cell>,

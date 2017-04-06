@@ -1,5 +1,4 @@
-use grid::Grid;
-use cell::Cell;
+use grid::{Grid, Cell};
 
 /// Represents a game in progress, that takes ownership of a Grid for its entire lifetime
 pub struct Game<'a> {

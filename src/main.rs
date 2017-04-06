@@ -1,9 +1,7 @@
 mod game;
 use game::Game;
 mod grid;
-use grid::Grid;
-mod cell;
-use cell::Cell;
+use grid::{Grid, Cell};
 
 fn main() {
     let mut b = Grid::with_dimension(10);
