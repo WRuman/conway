@@ -13,6 +13,28 @@ pub struct Grid {
     dim: usize,
 }
 
+pub struct GridIterator<'a> {
+    row_length: usize,
+    index: usize,
+    cells: &'a Vec<Cell>
+}
+
+impl<'a> Iterator for GridIterator<'a> {
+    type Item = (usize, usize, &'a Cell);
+    fn next(&mut self) -> Option<(usize, usize, &'a Cell)> {
+        let x = self.index % self.row_length;
+        let y = (self.index - x) / self.row_length;
+        let next_cell = self.cells.get(self.index);
+        match next_cell {
+            Some(c) => {
+                self.index += 1; 
+                Some((y, x, c))
+            },
+            None => None
+        }
+    }
+}
+
 impl Grid {
     /// Returns a square grid with dimensions (dim x dim). All cells default to Dead
     pub fn with_dimension(dim: usize) -> Grid {
@@ -41,6 +63,7 @@ impl Grid {
             };
         }
     }
+
     /// Returns length of any side of the grid
     pub fn dimension(&self) -> usize {
         self.dim
@@ -56,10 +79,19 @@ impl fmt::Display for Grid {
             }
             out.push(match *cell {
                 Cell::Alive => 'X',
-                Cell::Dead => 'O'
+                Cell::Dead => '-'
             });
         }
         f.write_str(out.as_str())
+    }
+}
+
+impl<'a> IntoIterator for &'a Grid {
+    type Item = (usize, usize, &'a Cell);
+    type IntoIter = GridIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        GridIterator {index: 0, row_length: self.dim, cells: &self.cells}
     }
 }
 

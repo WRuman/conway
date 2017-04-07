@@ -17,6 +17,7 @@ impl<'a> Game<'a> {
 
     /// Run the game one tick forward
     pub fn tick(&mut self) {
-       self.tick += 1; 
+        self.tick += 1;
     }
+
 }

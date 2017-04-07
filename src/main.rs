@@ -3,14 +3,21 @@ use game::Game;
 mod grid;
 use grid::{Grid, Cell};
 
+fn disp(board: &Grid) {
+    for cell in board {
+        let (y, x, c) = cell;
+        let state = match *c {
+            Cell::Alive => "Alive",
+            Cell::Dead => "Dead",
+        };
+        println!("{}, {} -> {}", y, x, state);
+    }
+}
+
 fn main() {
-    let mut b = Grid::with_dimension(10);
-    println!("{}", b);
-    println!("Top left corner is {:?}", b.at(0,0).unwrap_or(&Cell::Alive));
-    b.randomize();
-    println!("{}", b);
-    println!("Top left corner is {:?}", b.at(0,0).unwrap_or(&Cell::Dead));
-    let mut g = Game::new_with_board(&mut b); 
-    g.tick();
+    let mut other_board = Grid::with_dimension(5);
+    other_board.randomize();
+    println!("{}", other_board);
+    disp(&other_board);
 }
 
