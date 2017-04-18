@@ -1,11 +1,26 @@
 extern crate rand;
 use self::rand::Rng;
+use std::cmp::Ordering;
 use std::fmt;
 
-#[derive(Debug)]
+const NEIGHBOR_LOCS: [(i8, i8); 8] = 
+    [(-1, -1), (-1, 0), (-1, 1),
+     ( 0, -1),          ( 0, 1),
+     ( 1, -1), ( 1, 0), ( 1, 1)];
+
+#[derive(Debug,Copy,Clone)]
 pub enum Cell {
     Alive,
     Dead,
+}
+
+impl Cell {
+    fn is_alive(&self) -> bool {
+        match *self {
+            Cell::Alive => true,
+            Cell::Dead => false
+        }
+    }
 }
 
 pub struct Grid {
@@ -51,6 +66,66 @@ impl Grid {
     pub fn at(&self, y: usize, x : usize) -> Option<&Cell> {
         let idx = self.dim * y + x;
         self.cells.get(idx)
+    }
+
+    pub fn write_row(&mut self, rownum: usize, row: &Vec<Cell>) {
+        if row.len() == self.dim {
+            let start = rownum * self.dim;
+            for (offset, new_c) in row.iter().enumerate() {
+                self.cells[start + offset] = *new_c;
+            }
+        }
+    }
+    
+    /// Returns the number of living neighbors at a given grid location
+    /// Assume that the number of total neighbors (t) - number of living neighbors (l)
+    /// == the number of dead neighbors (d) such that d + l = t
+    pub fn living_neighbor_count(&self, loc: (usize, usize)) -> usize {
+        NEIGHBOR_LOCS.iter().fold(0, |acc, &neighbor| {
+            let (cy, cx) = loc;
+            let (ny, nx) = neighbor;
+            
+            let y = match ny.cmp(&0) {
+                Ordering::Less => {
+                    if cy < 1 {
+                       self.dim - ny.abs() as usize
+                    } else {
+                        cy - ny.abs() as usize
+                    }
+                },
+                Ordering::Equal => cy,
+                Ordering::Greater => {
+                    if cy >= self.dim {
+                        cy + ny as usize % self.dim
+                    } else {
+                        cy + ny as usize
+                    }
+                }
+            };
+
+            let x = match nx.cmp(&0) {
+                Ordering::Less => {
+                    if cx < 1 {
+                        self.dim - nx.abs() as usize
+                    } else {
+                        cx - nx.abs() as usize
+                    }
+                },
+                Ordering::Equal => cx,
+                Ordering::Greater => {
+                    if cx >= self.dim {
+                        cx + nx as usize % self.dim
+                    } else {
+                        cx + nx as usize
+                    }
+                }
+            };
+
+            acc + match self.at(y, x) {
+                Some(cell) => if cell.is_alive() { 1 } else { 0 },
+                None => 0
+            }
+        })
     }
 
     /// Sets each cell in the grid to a random Dead or Alive state
