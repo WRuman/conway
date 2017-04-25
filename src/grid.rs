@@ -8,7 +8,7 @@ const NEIGHBOR_LOCS: [(i8, i8); 8] =
      ( 0, -1),          ( 0, 1),
      ( 1, -1), ( 1, 0), ( 1, 1)];
 
-#[derive(Debug,Copy,Clone)]
+#[derive(Copy, Clone)]
 pub enum Cell {
     Alive,
     Dead,
@@ -63,17 +63,15 @@ impl Grid {
     /// Returns reference to cell at a given place in the grid, if possible.
     /// Cells are 0-indexed, increasing from the upper left corner to the 
     /// lower right corner. 
-    pub fn at(&self, y: usize, x : usize) -> Option<&Cell> {
+    fn at(&self, y: usize, x : usize) -> Option<&Cell> {
         let idx = self.dim * y + x;
         self.cells.get(idx)
     }
 
-    pub fn write_row(&mut self, rownum: usize, row: &Vec<Cell>) {
-        if row.len() == self.dim {
-            let start = rownum * self.dim;
-            for (offset, new_c) in row.iter().enumerate() {
-                self.cells[start + offset] = *new_c;
-            }
+    pub fn set_cell(&mut self, loc: (usize, usize), c: Cell) {
+        let idx = self.dim * loc.0 + loc.1;
+        if idx < self.cells.len() {
+            self.cells[idx] = c;
         }
     }
     
@@ -169,4 +167,3 @@ impl<'a> IntoIterator for &'a Grid {
         GridIterator {index: 0, row_length: self.dim, cells: &self.cells}
     }
 }
-

@@ -1,13 +1,16 @@
 mod game;
-use game::Game;
 mod grid;
-use grid::{Grid, Cell};
+use game::Game;
+use std::thread;
+use std::time::Duration;
 
 fn main() {
-    let mut other_board = Grid::with_dimension(5);
-    let tgt = (0, 0);
-    other_board.randomize();
-    println!("{}", other_board);
-    println!("{} living neighbors for cell at 1,1", other_board.living_neighbor_count(tgt));
+    let sleep_time = Duration::from_millis(850);
+    let mut sim = Game::new_with_size(10);
+    loop {
+        thread::sleep(sleep_time);
+        sim.tick();
+        sim.show_board();
+    }
 }
 
