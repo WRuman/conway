@@ -74,48 +74,43 @@ impl Grid {
             self.cells[idx] = c;
         }
     }
-    
+
     /// Returns the number of living neighbors at a given grid location
     /// Assume that the number of total neighbors (t) - number of living neighbors (l)
     /// == the number of dead neighbors (d) such that d + l = t
     pub fn living_neighbor_count(&self, loc: (usize, usize)) -> usize {
-        NEIGHBOR_LOCS.iter().fold(0, |acc, &neighbor| {
+        let y_overflow = loc.0 >= self.dim;
+        let x_overflow = loc.1 >= self.dim;
+        let y_may_underflow = loc.0 < 1;
+        let x_may_underflow = loc.1 < 1;
+
+        NEIGHBOR_LOCS.iter().filter(|&neighbor| {
+            let (ny, nx) = *neighbor;
+            !((ny < 0 && y_may_underflow) ||
+            (nx < 0 && x_may_underflow) ||
+            (ny > 0 && y_overflow) ||
+            (nx > 0 && x_overflow))
+        }).fold(0, |acc, &neighbor| {
             let (cy, cx) = loc;
             let (ny, nx) = neighbor;
             
             let y = match ny.cmp(&0) {
                 Ordering::Less => {
-                    if cy < 1 {
-                       self.dim - ny.abs() as usize
-                    } else {
-                        cy - ny.abs() as usize
-                    }
+                    cy - ny.abs() as usize
                 },
                 Ordering::Equal => cy,
                 Ordering::Greater => {
-                    if cy >= self.dim {
-                        cy + ny as usize % self.dim
-                    } else {
-                        cy + ny as usize
-                    }
+                    cy + ny as usize
                 }
             };
 
             let x = match nx.cmp(&0) {
                 Ordering::Less => {
-                    if cx < 1 {
-                        self.dim - nx.abs() as usize
-                    } else {
-                        cx - nx.abs() as usize
-                    }
+                    cx - nx.abs() as usize
                 },
                 Ordering::Equal => cx,
                 Ordering::Greater => {
-                    if cx >= self.dim {
-                        cx + nx as usize % self.dim
-                    } else {
-                        cx + nx as usize
-                    }
+                    cx + nx as usize
                 }
             };
 

@@ -5,8 +5,10 @@ use std::thread;
 use std::time::Duration;
 
 fn main() {
-    let sleep_time = Duration::from_millis(850);
-    let mut sim = Game::new_with_size(10);
+    let sleep_time = Duration::from_millis(350);
+    let mut sim = Game::new_with_size(50);
+    sim.add_glider();
+    sim.show_board();
     loop {
         thread::sleep(sleep_time);
         sim.tick();
